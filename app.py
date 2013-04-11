@@ -25,8 +25,11 @@ def get_page(callback):
 @get_page
 def main(url, page):
     # Return the content of the page
-    # @TODO: use template instead of content
-    return page.get('content','')
+    page_template = page.get('template', None)
+    if not page_template:
+        return page.get('content','')
+    return template(page_template, page=page)
+    
 
 if __name__ == '__main__':
     run(app, host='0.0.0.0', port=8096, reloader=True)
