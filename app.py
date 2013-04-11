@@ -8,14 +8,22 @@ app = Bottle()
 # Connection to our Mongo Database
 conn = MongoClient()
 
+
+def get_page(callback):
+    def wrapper(*args, **kwargs):
+        # Select the correct database
+        db = conn[DATABASE]
+        # Get the page matching the url
+        page = db.pages.find_one({'url':request.fullpath})
+        if not page: # If no page has been found, return 404
+            abort(404)
+        body = callback(*args, page=page, **kwargs)
+        return body
+    return wrapper
+
 @app.route('<url:path>')
-def main(url):
-    # Select the correct database
-    db = conn[DATABASE]
-    # Get the page matching the url
-    page = db.pages.find_one({'url':url})
-    if not page: # If no page has been found, return 404
-        abort(404)
+@get_page
+def main(url, page):
     # Return the content of the page
     # @TODO: use template instead of content
     return page.get('content','')
