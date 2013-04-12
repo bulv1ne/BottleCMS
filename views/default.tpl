@@ -5,7 +5,7 @@
   </head>
   <body>
     <h1>Hello</h1>
-    {{ page.get('content') }}
+    {{! page.get('content') }}
   </body>
 </html>
   

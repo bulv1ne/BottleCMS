@@ -1,13 +1,42 @@
 #!/usr/bin/env python
 from bottle import Bottle, run, template, debug, redirect, request, view, abort, error
 from pymongo import MongoClient
+from bson.objectid import ObjectId
 
 DATABASE = 'BottleCMS'
 
-app = Bottle()
 # Connection to our Mongo Database
 conn = MongoClient()
 
+
+# Admin app
+admin_app = Bottle()
+
+@admin_app.route('/', name='admin', template='admin.tpl')
+def admin():
+    # Select the correct database
+    db = conn[DATABASE]
+    return {
+            'pages': db.pages.find(),
+            'get_url':admin_app.get_url
+            }
+
+@admin_app.route('/page/<page>', name='admin_page', template='admin_page.tpl')
+def admin_page(page):
+    # Select the correct database
+    db = conn[DATABASE]
+    page = db.pages.find_one({ '_id': ObjectId(page) })
+    if not page:
+        abort(404)
+    return {
+            'page': page,
+            'get_url':admin_app.get_url
+            }
+
+# Root app
+app = Bottle()
+# Mount the admin app
+app.mount('/admin', admin_app)
 
 def get_page(callback):
     def wrapper(*args, **kwargs):
