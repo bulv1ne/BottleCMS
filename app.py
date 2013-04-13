@@ -33,6 +33,21 @@ def admin_page(page):
             'get_url':admin_app.get_url
             }
 
+@admin_app.post('/page/<page>', name='admin_page', template='admin_page.tpl')
+def admin_page_post(page):
+    # Select the correct database
+    db = conn[DATABASE]
+    page = db.pages.find_one({ '_id': ObjectId(page) })
+    if not page:
+        abort(404)
+    for key in request.forms.keys():
+        page[key] = request.forms.get(key)
+    db.pages.save(page)
+    return {
+            'page': page,
+            'get_url':admin_app.get_url
+            }
+
 # Root app
 app = Bottle()
 # Mount the admin app
