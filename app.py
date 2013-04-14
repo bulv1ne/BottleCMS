@@ -54,6 +54,19 @@ def admin_page_new():
             'page': {},
             'get_url':admin_app.get_url
             }
+
+@admin_app.route('/page/<page>/delete', name='admin_page_delete')
+def admin_page_delete(page):
+    # Select the correct database
+    db = conn[DATABASE]
+    page = db.pages.find_one({ '_id': ObjectId(page) })
+    if not page:
+        abort(404)
+
+    # TODO: ask for confirmation
+    db.pages.remove(page)
+
+    redirect(admin_app.get_url('admin'))
  
 
 # Root app
