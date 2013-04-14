@@ -48,6 +48,26 @@ def admin_page_post(page):
             'get_url':admin_app.get_url
             }
 
+@admin_app.route('/page/new', name='admin_page_new', template='admin_page_new.tpl')
+def admin_page_new():
+    # Select the correct database
+    db = conn[DATABASE]
+    return {
+            'page': {},
+            'get_url':admin_app.get_url
+            }
+
+@admin_app.post('/page/new', name='admin_page_new')
+def admin_page_new_post():
+    # Select the correct database
+    db = conn[DATABASE]
+    
+    page = {}
+    for key in request.forms.keys():
+        page[key] = request.forms.get(key)
+    db.pages.save(page)
+    redirect(admin_app.get_url('admin_page', page=page.get('_id')))
+
 # Root app
 app = Bottle()
 # Mount the admin app
