@@ -31,8 +31,7 @@ def admin_page(page):
         
     # Check for post request
     if request.method == "POST":
-        for key in request.forms.keys():
-            page[key] = request.forms.get(key)
+        page.update(request.forms)
         db.pages.save(page)
     
     return {
@@ -47,8 +46,7 @@ def admin_page_new():
         # Select the correct database
         db = conn[DATABASE]
         page = {}
-        for key in request.forms.keys():
-            page[key] = request.forms.get(key)
+        page.update(request.forms)
         db.pages.save(page)
         redirect(admin_app.get_url('admin_page', page=page.get('_id')))
     
