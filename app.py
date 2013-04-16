@@ -8,14 +8,14 @@ DATABASE = 'BottleCMS'
 # Connection to our Mongo Database
 conn = MongoClient()
 
+# Select the correct database
+db = conn[DATABASE]
 
 # Admin app
 admin_app = Bottle()
 
 @admin_app.route('/', name='admin', template='admin.tpl')
 def admin():
-    # Select the correct database
-    db = conn[DATABASE]
     return {
             'pages': db.pages.find(),
             'get_url':admin_app.get_url
@@ -23,8 +23,6 @@ def admin():
 
 @admin_app.route('/page/<page>', method=['GET','POST'], name='admin_page', template='admin_page.tpl')
 def admin_page(page):
-    # Select the correct database
-    db = conn[DATABASE]
     page = db.pages.find_one({ '_id': ObjectId(page) })
     if not page:
         abort(404)
@@ -43,8 +41,6 @@ def admin_page(page):
 def admin_page_new():
     # Check for post request
     if request.method == "POST":
-        # Select the correct database
-        db = conn[DATABASE]
         page = {}
         page.update(request.forms)
         db.pages.save(page)
@@ -57,8 +53,6 @@ def admin_page_new():
 
 @admin_app.route('/page/<page>/delete', name='admin_page_delete')
 def admin_page_delete(page):
-    # Select the correct database
-    db = conn[DATABASE]
     page = db.pages.find_one({ '_id': ObjectId(page) })
     if not page:
         abort(404)
@@ -76,8 +70,6 @@ app.mount('/admin', admin_app)
 
 def get_page(callback):
     def wrapper(*args, **kwargs):
-        # Select the correct database
-        db = conn[DATABASE]
         # Get the page matching the url
         page = db.pages.find_one({'url':request.fullpath})
         if not page: # If no page has been found, return 404
