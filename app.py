@@ -81,7 +81,7 @@ def get_page(callback):
 @app.route('<url:path>')
 @get_page
 def main(url, page):
-    page_template = page.get('template', None)
+    page_template = page.get('template')
     if not page_template:
         # Return the content of the page
         return page.get('content','')
